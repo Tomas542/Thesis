@@ -7,22 +7,11 @@ RM = rm -f
 TEMPORARY_FILES = *.out *.aux *.blg *.bbl *.toc *.nav *.snm
 LOG_FILES = *.log
 
-DOCKER_RUN = docker run
-DOCKER_FLAGS = --rm -i -v "${PWD}":/diplom:Z
-DOCKER_IMAGE = 2109199812/docker-latex
-DOCKER_COMMAND = make release
 
 FILES_TO_BUILD := $(patsubst %.tex,%.pdf,$(wildcard *.tex))
 
 .PHONY: all release clean clean_after_build clean_diploma clean_presentation
 
-all:
-	$(DOCKER_RUN) $(DOCKER_FLAGS) $(DOCKER_IMAGE) $(DOCKER_COMMAND)
-
-release: clean $(FILES_TO_BUILD) clean_after_build
-
-diploma presentation:
-	$(DOCKER_RUN) $(DOCKER_FLAGS) $(DOCKER_IMAGE) bash -c "make clean_$@ && make $@.pdf && make clean_after_build"
 
 %.pdf: %.tex
 	$(LATEX_COMPILER) $(LATEX_COMPILER_FLAGS) $*
