@@ -1,3 +1,5 @@
+# TODO: Поменять README после дописания статьи. Поменять название репозитория на BSIT_thesis
+
 ![build](https://img.shields.io/github/actions/workflow/status/NikitaDmitryuk/ThesisMagistr/main.yml)
 ![downloads](https://img.shields.io/github/downloads/NikitaDmitryuk/ThesisMagistr/total)
 ![release](https://img.shields.io/github/v/release/NikitaDmitryuk/ThesisMagistr?display_name=tag)
