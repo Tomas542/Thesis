@@ -1,4 +1,5 @@
 # TODO: Поменять README после дописания статьи. Поменять название репозитория на BSIT_thesis
+# TODO: конец введения про PGD.
 
 ![build](https://img.shields.io/github/actions/workflow/status/NikitaDmitryuk/ThesisMagistr/main.yml)
 ![downloads](https://img.shields.io/github/downloads/NikitaDmitryuk/ThesisMagistr/total)
