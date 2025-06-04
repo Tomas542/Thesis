@@ -13,10 +13,12 @@ times % use Times font as main
 \usepackage[left=3cm, right=1cm, top=2cm, bottom=2cm]{geometry} % поля страницы
 \usepackage{graphicx} % подключение графики
 \usepackage{pdfpages} % вставка pdf-страниц
+\usepackage{booktabs}
 
 % Таблицы
 \usepackage{array} % расширенные возможности для работы с таблицами
 \usepackage{tabularx} % автоматический подбор ширины столбцов
+\usepackage{longtable}
 \usepackage{dcolumn} % выравнивание чисел по разделителю
 
 % Математика
@@ -40,6 +42,7 @@ times % use Times font as main
 
 % Установка шрифта Times New Roman
 \renewcommand{\rmdefault}{ftm}
+\renewcommand{\sectionindent}{1cm}
 
 % Создание нового типа столбца для выравнивания содержимого по центру
 \newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}

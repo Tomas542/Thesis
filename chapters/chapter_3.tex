@@ -73,21 +73,21 @@
 
 \begin{table}[]
 \centering
-\caption{Сравнение значений WER. ruT5 модель была натренирована на CV21 и RuLS.}
+\caption{-- Сравнение значений WER. ruT5 модель была натренирована на CV21, RuLS и OpenSTT-YouTuve val 700.}
 \begin{tabular}{|c|c|ccc|}
 \hline
 \multirow{2}{*}{Модель}        & \multirow{2}{*}{Сеттинг}             & \multicolumn{3}{c|}{Датасет, WER}                                    \\ \cline{3-5} 
                                &                                      & \multicolumn{1}{c|}{CV21}  & \multicolumn{1}{c|}{RuLS}     & OpenSTT \\ \hline
 \multirow{6}{*}{Fastconformer} & Greedy                               & \multicolumn{1}{c|}{12.31} & \multicolumn{1}{c|}{38.43}    & -       \\ \cline{2-5} 
-                               & BeamSearch                           & \multicolumn{1}{c|}{12.26} & \multicolumn{1}{c|}{38.84}    & -       \\ \cline{2-5} 
-                               & LM                                   & \multicolumn{1}{c|}{9.87}  & \multicolumn{1}{c|}{-}    & -       \\ \cline{2-5} 
-                               & Greedy+Distill                       & \multicolumn{1}{c|}{13.81} & \multicolumn{1}{c|}{42.16}    & -       \\ \cline{2-5} 
-                               & BeamSearch+Distill                   & \multicolumn{1}{c|}{3.82}  & \multicolumn{1}{c|}{-}    & -       \\ \cline{2-5} 
-                               & BeamSearch+ruT5                      & \multicolumn{1}{c|}{-}     & \multicolumn{1}{c|}{-}    & -       \\ \hline
+                               & BeamSearch                           & \multicolumn{1}{c|}{12.26} & \multicolumn{1}{c|}{38.84}    & 25.07       \\ \cline{2-5} 
+                               & LM                                   & \multicolumn{1}{c|}{9.87}  & \multicolumn{1}{c|}{40.18}    & -       \\ \cline{2-5} 
+                               & Greedy+Distill                       & \multicolumn{1}{c|}{13.81} & \multicolumn{1}{c|}{-}    & -       \\ \cline{2-5} 
+                               & BeamSearch+Distill                   & \multicolumn{1}{c|}{3.82}  & \multicolumn{1}{c|}{42.16}    & -       \\ \cline{2-5} 
+                               & BeamSearch+ruT5                      & \multicolumn{1}{c|}{9.75}  & \multicolumn{1}{c|}{34.32}    & 23.81       \\ \hline
 \multirow{4}{*}{Whisper}       & Greedy                               & \multicolumn{1}{c|}{19.60} & \multicolumn{1}{c|}{-}    & -       \\ \cline{2-5} 
-                               & BeamSearch                           & \multicolumn{1}{c|}{18.33} & \multicolumn{1}{c|}{35.49}    & -       \\ \cline{2-5} 
-                               & Greedy+Distill                       & \multicolumn{1}{c|}{20.57} & \multicolumn{1}{c|}{-}    & -       \\ \cline{2-5} 
-                               & BeamSearch+ruT5                      & \multicolumn{1}{c|}{-}     & \multicolumn{1}{c|}{-}    & -       \\ \hline
+                               & BeamSearch                           & \multicolumn{1}{c|}{18.33} & \multicolumn{1}{c|}{35.49}    & 24.19       \\ \cline{2-5} 
+                               & Greedy+Distill                       & \multicolumn{1}{c|}{20.57} & \multicolumn{1}{c|}{41.40}    & -       \\ \cline{2-5} 
+                               & BeamSearch+ruT5                      & \multicolumn{1}{c|}{14.32} & \multicolumn{1}{c|}{32.48}    & 23.90       \\ \hline
 \end{tabular}
 \label{tab:res_full}
 \end{table}
@@ -102,9 +102,9 @@
 \hline
 \multirow{2}{*}{Модель}        & \multirow{2}{*}{Сеттинг}             & \multicolumn{3}{c|}{Датасет, WER}                                    \\ \cline{3-5} 
                                &                                      & \multicolumn{1}{c|}{CV21}  & \multicolumn{1}{c|}{RuLS}     & OpenSTT \\ \hline
-\multirow{2}{*}{Fastconformer} & BeamSearch                           & \multicolumn{1}{c|}{12.26} & \multicolumn{1}{c|}{38.34}    & -       \\ \cline{2-5} 
+\multirow{2}{*}{Fastconformer} & BeamSearch                           & \multicolumn{1}{c|}{12.26} & \multicolumn{1}{c|}{38.34}    & 25.07   \\ \cline{2-5} 
                                & BeamSearch+ruT5                      & \multicolumn{1}{c|}{3.20}  & \multicolumn{1}{c|}{40.07}    & -       \\ \hline
-\multirow{2}{*}{Whisper}       & BeamSearch                           & \multicolumn{1}{c|}{18.33} & \multicolumn{1}{c|}{35.49}    & -       \\ \cline{2-5} 
+\multirow{2}{*}{Whisper}       & BeamSearch                           & \multicolumn{1}{c|}{18.33} & \multicolumn{1}{c|}{35.49}    & 24.19   \\ \cline{2-5} 
                                & BeamSearch+ruT5                      & \multicolumn{1}{c|}{4.99}  & \multicolumn{1}{c|}{38.04}    & -       \\ \hline
 \end{tabular}
 \label{tab:res_cv_trained}
@@ -118,6 +118,10 @@
 Также в обоих случаях использование дистиллированной модели при сценарии жадного декодирования не принесло никакого прироста в качестве, а наоборот показало ухудшение. Причин такого падения назвать наверняка нельзя.
 Можно сказать, что ASR модели, используя свои знания о языке, имеют более точное представление о правописание и пунктуации.
 Или же distill модель пыталась поменять какое-то слово, которое в изменение не нуждалось, из-за чего WER вырос.
+
+% \textbf{ЭКСПЕРИМЕНТ С ТЕКСТОВЫМИ АУГМЕНТАЦИЯМИ}
+
+% \textbf{ЭКСПЕРИМЕНТ С PGD ПО WHISPER}
 
 По итогу можно уверенно сказать, что наш метод показал в разы лучшее качество в сравнение с другими методами и при этом затраты вычислительных ресурсов, требуемых для inference пары Fastconformer + ruT5 сравнительно не велико.
 В сумме обе эти модели помещаются в 3-4 Гб видеопамяти, что в современном мире является минимумом для самых низкобюджетных карт, в том числе и среди ноутбучных.
