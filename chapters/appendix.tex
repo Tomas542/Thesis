@@ -1,13 +1,9 @@
 \newpage
 \begin{center}
-  \textbf{\large ПРИЛОЖЕНИЕ А}
+  \textbf{\large ПРИЛОЖЕНИЕ А\\Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
 \end{center}
 \refstepcounter{chapter}
-\addcontentsline{toc}{chapter}{ПРИЛОЖЕНИЕ А}
-
-Очевидно неудачный эксперимент с neftune CV онли.
-
-Nemo = 1.6994516301254496, Whisper = 1.6890259441571887
+\addcontentsline{toc}{chapter}{ПРИЛОЖЕНИЕ А Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
 
 \begin{lstlisting}[language=Python,label={lst:train},caption=train.py,breaklines=true,]
 import dotenv
@@ -195,7 +191,7 @@ from utils import NoStdStreams, silent_logs
 def main(cfg: dict) -> None:
   silent_logs()
   asr_model = nemo_asr.models.EncDecHybridRNNTCTCBPEModel.from_pretrained(
-      model_name="nvidia/stt_ru_fastconformer_hybrid_large_pc"
+      model_name="nvidia/stt_ru_FastConformer_hybrid_large_pc"
     )
   config = OmegaConf.load("configs/nemo/fast-conformer_transducer_bpe.yaml")
   decoding_config = copy.deepcopy(config.model.decoding)

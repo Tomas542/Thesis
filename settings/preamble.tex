@@ -42,7 +42,15 @@ times % use Times font as main
 
 % Установка шрифта Times New Roman
 \renewcommand{\rmdefault}{ftm}
+
+% Отступ для разделов и подразделов
 \renewcommand{\sectionindent}{1cm}
+\renewcommand{\subsectionindent}{1cm}
+
+% Называем Рис. - Рисунок
+\addto\captionsrussian{
+    \renewcommand{\figurename}{Рисунок}
+}
 
 % Создание нового типа столбца для выравнивания содержимого по центру
 \newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
