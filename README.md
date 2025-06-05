@@ -1,5 +1,5 @@
 # TODO: Поменять README после дописания статьи. Поменять название репозитория на BSIT_thesis
-# TODO: Дописат количество страниц и ссылок.
+# TODO: Дописат количество страниц и ссылокё.
 
 ![build](https://img.shields.io/github/actions/workflow/status/NikitaDmitryuk/ThesisMagistr/main.yml)
 ![downloads](https://img.shields.io/github/downloads/NikitaDmitryuk/ThesisMagistr/total)
