@@ -5,7 +5,14 @@
 \refstepcounter{chapter}
 \addcontentsline{toc}{chapter}{ПРИЛОЖЕНИЕ А Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
 
-\begin{lstlisting}[language=Python,label={lst:train},caption=train.py,breaklines=true,]
+\begin{lstlisting}[
+  language=Python,
+  label={lst:train},
+  caption=train.py,
+  breaklines=true,
+  basicstyle=\small,
+  frame=single,
+]
 import dotenv
 import hydra
 import wandb
@@ -86,7 +93,14 @@ if __name__ == "__main__":
   main()
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python,label={lst:eval},caption=eval.py,breaklines=true,]
+\begin{lstlisting}[
+  language=Python,
+  label={lst:eval},
+  caption=eval.py,
+  breaklines=true,
+  basicstyle=\small,
+  frame=single,
+]
 import evaluate
 import hydra
 import torch
@@ -173,7 +187,14 @@ if __name__ == "__main__":
   main()
 \end{lstlisting}
 
-\begin{lstlisting}[language=Python,label={lst:generate},caption=generate\_hypotheses.py,breaklines=true,]
+\begin{lstlisting}[
+  language=Python,
+  label={lst:generate},
+  caption=generate\_hypotheses.py,
+  breaklines=true,
+  basicstyle=\small,
+  frame=single,
+]
 from omegaconf import OmegaConf
 import hydra
 import nemo.collections.asr as nemo_asr
