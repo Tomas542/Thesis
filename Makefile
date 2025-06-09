@@ -12,7 +12,6 @@ FILES_TO_BUILD := $(patsubst %.tex,%.pdf,$(wildcard *.tex))
 
 .PHONY: all release clean clean_after_build clean_diploma clean_presentation
 
-
 %.pdf: %.tex
 	$(LATEX_COMPILER) $(LATEX_COMPILER_FLAGS) $*
 	@if (grep "citation{.*}" $*.aux > /dev/null); then \
@@ -22,10 +21,7 @@ FILES_TO_BUILD := $(patsubst %.tex,%.pdf,$(wildcard *.tex))
 	$(LATEX_COMPILER) $(LATEX_COMPILER_FLAGS) $*
 
 clean:
+	$(RM) $(TEMPORARY_FILES) $(LOG_FILES) 
+
+clean_all:
 	$(RM) $(FILES_TO_BUILD) $(LOG_FILES) $(TEMPORARY_FILES)
-
-clean_after_build:
-	$(RM) $(TEMPORARY_FILES)
-
-clean_diploma clean_presentation:
-	$(RM) $(TEMPORARY_FILES) $(subst clean_,,$@).pdf

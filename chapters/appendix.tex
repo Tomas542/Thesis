@@ -1,9 +1,107 @@
 \newpage
 \begin{center}
-  \textbf{\large ПРИЛОЖЕНИЕ А\\Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
+  \textbf{\large Приложение А.\\Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
 \end{center}
 \refstepcounter{chapter}
-\addcontentsline{toc}{chapter}{ПРИЛОЖЕНИЕ А Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
+\addcontentsline{toc}{chapter}{Приложение А. Исходный код для генерации гипотез, обучения и оценки качества языковых моделей}
+
+Код для генерации гипотез в листинге~\ref{lst:generate}.
+Здесь мы настраиваем модель на декодирование с BeamSearch.
+Затем считываем файл с путями и начинаем генерировать гипотезы.
+Далее мы форматируем код, избавляясь от необычных решений разметки.
+
+\begin{lstlisting}[
+  language=Python,
+  label={lst:generate},
+  caption=generate\_hypotheses.py,
+  breaklines=true,
+  basicstyle=\small,
+  frame=single,
+]
+from omegaconf import OmegaConf
+import hydra
+import nemo.collections.asr as nemo_asr
+import pandas as pd
+from tqdm import tqdm
+
+import copy
+import json
+import random
+from pathlib import Path
+
+from utils import NoStdStreams, silent_logs
+
+@hydra.main(config_path="configs", config_name="generate_hp", version_base="1.3")
+def main(cfg: dict) -> None:
+  silent_logs()
+  asr_model = nemo_asr.models.EncDecHybridRNNTCTCBPEModel.from_pretrained(
+      model_name="nvidia/stt_ru_FastConformer_hybrid_large_pc"
+    )
+  config = OmegaConf.load("configs/nemo/fast-conformer_transducer_bpe.yaml")
+  decoding_config = copy.deepcopy(config.model.decoding)
+  decoding_config.strategy = cfg.nemo.strategy
+  decoding_config.beam.beam_size = cfg.nemo.beam_size
+  decoding_config.beam.return_best_hypothesis = cfg.nemo.return_best_hypothesis
+  asr_model.change_decoding_strategy(decoding_config)
+
+  for split in ["train"]:
+    if "cv" in cfg.data.path:
+      base_path = Path(cfg.data.path)
+      df = pd.read_csv(Path(base_path, f"{split}.tsv"))
+      base_path = Path(base_path, "clips")
+
+      df = df[df['exist']]
+      pathes = [str(Path(base_path, path)) for path in df['path'].to_list()]
+      transcriptions = df['sentence'].to_list()
+      del df
+      iterable = zip(pathes, transcriptions)
+    else:
+      base_path = Path(cfg.data.path, split)
+      with open(Path(base_path, "manifest.json"),'r',encoding="utf-8") as file:
+          iterable = file.readlines()
+
+    all_data = []
+
+    for i, it in enumerate(tqdm(iterable)):
+      if "cv" in cfg.data.path:
+        path, gt = it
+      else:
+        it = eval(it)
+        path = str(base_path)+"/"+it['audio_filepath']
+        gt = it["text_no_preprocessing"]
+      with NoStdStreams():
+        all_hypotheses = asr_model.transcribe(path, batch_size=1)
+      n_best = []
+      for hypothesis in all_hypotheses[0]:
+        if hypothesis.text not in n_best:
+          n_best.append(hypothesis.text.strip())
+          if len(n_best) == 5:
+            break
+
+      # sampling
+      while len(n_best) < 5:
+        n_best.append(random.choice(n_best))
+
+      gt = gt.strip().replace('""', '"')
+      if gt.startswith('"') and gt.endswith('"'):
+        gt = gt[1:-1]
+
+      all_data.append({
+        "n_best": n_best,
+        "gt": gt
+      })
+      if i % 200 == 0:
+        with open(Path(base_path, f"{split}.json"),"w",encoding="utf-8") as file:
+          json.dump(all_data, file)
+
+    with open(Path(base_path, f"{split}.json"),"w",encoding="utf-8") as file:
+      json.dump(all_data, file)
+
+if __name__=="__main__":
+  main()
+\end{lstlisting}
+
+В обучение~\ref{lst:train} мы инициализируем нужные модели, передаём конфигурации для обучения и обучаем с трекингом через wandb пакет.
 
 \begin{lstlisting}[
   language=Python,
@@ -92,6 +190,8 @@ def main(cfg: dict) -> None:
 if __name__ == "__main__":
   main()
 \end{lstlisting}
+
+В валидации~\ref{lst:eval} мы загружаем обученные адаптеры и делаем коррекцию.
 
 \begin{lstlisting}[
   language=Python,
@@ -184,96 +284,5 @@ def main(cfg: dict) -> None:
   pd.DataFrame(output).to_csv("output_nemo_cv.csv", index=False)
 
 if __name__ == "__main__":
-  main()
-\end{lstlisting}
-
-\begin{lstlisting}[
-  language=Python,
-  label={lst:generate},
-  caption=generate\_hypotheses.py,
-  breaklines=true,
-  basicstyle=\small,
-  frame=single,
-]
-from omegaconf import OmegaConf
-import hydra
-import nemo.collections.asr as nemo_asr
-import pandas as pd
-from tqdm import tqdm
-
-import copy
-import json
-import random
-from pathlib import Path
-
-from utils import NoStdStreams, silent_logs
-
-@hydra.main(config_path="configs", config_name="generate_hp", version_base="1.3")
-def main(cfg: dict) -> None:
-  silent_logs()
-  asr_model = nemo_asr.models.EncDecHybridRNNTCTCBPEModel.from_pretrained(
-      model_name="nvidia/stt_ru_FastConformer_hybrid_large_pc"
-    )
-  config = OmegaConf.load("configs/nemo/fast-conformer_transducer_bpe.yaml")
-  decoding_config = copy.deepcopy(config.model.decoding)
-  decoding_config.strategy = cfg.nemo.strategy
-  decoding_config.beam.beam_size = cfg.nemo.beam_size
-  decoding_config.beam.return_best_hypothesis = cfg.nemo.return_best_hypothesis
-  asr_model.change_decoding_strategy(decoding_config)
-
-  for split in ["train"]:
-    if "cv" in cfg.data.path:
-      base_path = Path(cfg.data.path)
-      df = pd.read_csv(Path(base_path, f"{split}.tsv"))
-      base_path = Path(base_path, "clips")
-
-      df = df[df['exist']]
-      pathes = [str(Path(base_path, path)) for path in df['path'].to_list()]
-      transcriptions = df['sentence'].to_list()
-      del df
-      iterable = zip(pathes, transcriptions)
-    else:
-      base_path = Path(cfg.data.path, split)
-      with open(Path(base_path, "manifest.json"),'r',encoding="utf-8") as file:
-          iterable = file.readlines()
-
-    all_data = []
-
-    for i, it in enumerate(tqdm(iterable)):
-      if "cv" in cfg.data.path:
-        path, gt = it
-      else:
-        it = eval(it)
-        path = str(base_path)+"/"+it['audio_filepath']
-        gt = it["text_no_preprocessing"]
-      with NoStdStreams():
-        all_hypotheses = asr_model.transcribe(path, batch_size=1)
-      n_best = []
-      for hypothesis in all_hypotheses[0]:
-        if hypothesis.text not in n_best:
-          n_best.append(hypothesis.text.strip())
-          if len(n_best) == 5:
-            break
-
-      # sampling
-      while len(n_best) < 5:
-        n_best.append(random.choice(n_best))
-
-      gt = gt.strip().replace('""', '"')
-      if gt.startswith('"') and gt.endswith('"'):
-        gt = gt[1:-1]
-
-      all_data.append({
-        "n_best": n_best,
-        "gt": gt
-      })
-      if i % 200 == 0:
-        with open(Path(base_path, f"{split}.json"),"w",encoding="utf-8") as file:
-          json.dump(all_data, file)
-
-    with open(Path(base_path, f"{split}.json"),"w",encoding="utf-8") as file:
-      json.dump(all_data, file)
-
-if __name__=="__main__":
   main()
 \end{lstlisting}
